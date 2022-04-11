@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1044161850195",
+    "project_id": "fir-demo-68435",
+    "storage_bucket": "fir-demo-68435.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1044161850195:android:f5771af15010cb472ccfa6",
+        "android_client_info": {
+          "package_name": "ca.sudbury.hojat.firebasedemo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1044161850195-6e79rt5a966n8rk3757q1kv5pt6hhne5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAvGbFoyIe0986kaWvw5Rkb1OfFFLE0u38"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1044161850195-6e79rt5a966n8rk3757q1kv5pt6hhne5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -19,7 +19,7 @@ business.
   data types such as Strings, Integers, Booleans, Arrays, nested objects, raw binary values, coordinates, and some other
   complex data structures. <br/>
   In this context, nested objects are called <b>maps</b>; for example, in document above, "name" is a map with 2 parts
-  for "first" and "last".<br/><br/>
+  for "first" and "last" name.<br/><br/>
   Documents are organized into "Collections" 👇👇<br/><br/>
   <img alt="collection" src="DocumentationAssets/collection.png"  width="30%" height="30%"/><br/><br/>
   Collections serve as folders for our documents. As you see above, each document within a collection has a unique ID;
@@ -31,9 +31,8 @@ The firestore database is schema-less (exactly on the opposite of XML based data
 of putting any fields or data types into each separate document. We don't necessarily have to put the same fields into
 documents of the same collection. For example 👇👇<br/><br/>
 <img alt="users collection" src="DocumentationAssets/users_collection.png"  width="60%" height="60%"/><br/><br/>
-In the collection of "users" we have above; we can later add more fields to some of those user documents without
-breaking anything. In the collection of "users" we have above; we can later add more fields to some of those user
-documents without facing errors.
+For example, in the collection of "users" we have above; we can later add more fields to some of those user documents without
+breaking anything.
 
 #### Warning: For querying purposes, it's usually better to have the same fields over multiple documents.
 
@@ -49,18 +48,33 @@ It's often the case to have your NoSQL database as a collection that contains do
 <br/><br/>
 <img alt="example database of a chatroom app" src="DocumentationAssets/chatroom_example.png"  width="60%" height="60%"/><br/><br/>
 In the example picture above, we have the NoSQL database of a chat app that saves chatrooms in a collection called "rooms" where each room is represented by a document. And since firestore is optimized to host a large number of small documents (like tens of millions or even billions of small documents), we have stored each chat message in a separate document (all messages are in a collection named "messages").<br/><br/>
-Collections and documents are created <b>implicitly</b>, we simply create a reference to them and set a value on that reference. If that document/collection doesn't exist, it'll be created; and if it exists, it'll be updated. Furthermore, when you delete all the documents within a collection, the collection itself will be deleted as well.
+Collections and documents are created <b>implicitly</b>, we simply create a reference to them and set a value on that reference. If that document/collection doesn't exist, it'll be created; and if it exists, it'll be updated. Furthermore, when you delete a collection, all the documents within that  collection will be deleted as well. 
 
-##### FireStore database also works offline.
+## **FireStore database also works offline.**
 
-Ofcourse you can't update anything in the cloud without internet connection but we have a copy of currently used
+Of course you can't update anything in the cloud without internet connection but we have a copy of currently used
 firestore database, cached on the device. Your app can query, listen, and make changes to this cached database. As soon
-as user get backs online, this offline database will be synchronized with the cloud. For more info, have a
+as user gets back online, this offline database will be synchronized with the cloud. For more info, have a
 look <a href="https://firebase.google.com/docs/firestore/manage-data/enable-offline">here</a>.
 
 -------------------------------------------
 
-##### How to setup firestore in an Android project
+## **How to setup firestore in an Android project:**
 
 For latest info about how to add firestore or other services of firebase to an Android project,
 look <a href="https://firebase.google.com/docs/android/setup">here</a>.
+
+While your project is open in Android Studio, go to "Tools/Firebase" and in the new window that shows up, follow all the instruction in the "Firestore" section.
+
+Now if you look at your Gradle dependencies, you will have these new libraries added:
+
+```
+// Firestore database
+implementation 'com.google.firebase:firebase-firestore:24.1.0'
+```
+ After doing all of these stuff, you will see the new project added to your Firebase console. In your console go to "Build" menu and choose "Firestore Database"; In the new page click on **Create Database**. 
+
+ In the page below choose "test mode" and click Next 👇👇
+ <br/><br/>
+<img alt="warnings about documents in NoSQL database" src="DocumentationAssets/firestore setup.png"  width="80%" height="80%"/><br/><br/>
+After choosing the location of your database (just choose some place that is nearest to the majority of your prospective users), you will see the mainpage for your Firestore database.
