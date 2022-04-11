@@ -1,5 +1,6 @@
 package ca.sudbury.hojat.firebasedemo
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -19,6 +20,10 @@ class MainActivity : AppCompatActivity() {
     // A reference to Firestore database
     val db = FirebaseFirestore.getInstance()
 
+    // A reference to the document that we're interacting with ().
+    val noteRef = db.collection("Notebook").document("My First Note")
+
+    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
@@ -35,7 +40,7 @@ class MainActivity : AppCompatActivity() {
             // Now we create a "Notebook" collection, the document
             // "My First Note" inside that collection and will add
             // our key-value pairs to that document.
-            db.collection("Notebook").document("My First Note").set(note)
+            noteRef.set(note)
                 .addOnSuccessListener {
                     // the call was successful
                     Toast.makeText(this, "Note saved successfully!", Toast.LENGTH_SHORT).show()
@@ -50,6 +55,27 @@ class MainActivity : AppCompatActivity() {
                     Log.e(TAG, "Firestore Error : ${it.message}")
                 }
 
+        }
+        binding.buttonLoad.setOnClickListener {
+            noteRef.get()
+                .addOnSuccessListener {
+                    if (it.exists()) {
+                        // Get our needed data out of this DocumentSnapshot and load into TextView.
+                        val note = it.getData()
+                        binding.textViewData.text =
+                            "Title : ${note?.get(KEY_TITLE)}\nDescription : ${
+                                note?.get(
+                                    KEY_DESCRIPTION
+                                )
+                            }"
+                    } else {
+                        Toast.makeText(this, "Document doesn't exist!", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                .addOnFailureListener {
+                    Toast.makeText(this, "Error retrieving data!", Toast.LENGTH_SHORT).show()
+                    Log.e(TAG, it.message.toString())
+                }
         }
     }
 }

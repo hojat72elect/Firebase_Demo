@@ -78,3 +78,85 @@ implementation 'com.google.firebase:firebase-firestore:24.1.0'
  <br/><br/>
 <img alt="warnings about documents in NoSQL database" src="DocumentationAssets/firestore setup.png"  width="80%" height="80%"/><br/><br/>
 After choosing the location of your database (just choose some place that is nearest to the majority of your prospective users), you will see the mainpage for your Firestore database.
+
+-------------------------------------------
+-------------------------------------------
+
+### **How to send your data back to Firestore database**:
+
+You firstly need to have a reference to your Firestore database like this (better to define it as a Singleton class):
+
+```
+// A reference to Firestore database
+val db = FirebaseFirestore.getInstance()
+```
+
+Imagine you have 2 string values named `title` and `description`; and you want to send them to the Firestore data base. You need to firstly create a key-value structure of that information like this:
+
+```
+// we need to firstly put our data into key-value pairs
+// and then upload them into Firestore
+  val note = HashMap<String, Any>().apply {
+          this.put(KEY_TITLE, title)
+          this.put(KEY_DESCRIPTION, description)
+          }
+```
+
+And then, you will create a collection and document for saving this info to FireStore database. You even have some callbacks as scenarios for what to do if this database interaction was successful or resulted to an error. 👇👇
+
+```
+// Now we create a "Notebook" collection, the document
+// "My First Note" inside that collection and will add
+// our key-value pairs to that document.
+  db.collection("Notebook").document("My First Note").set(note)
+                .addOnSuccessListener {
+                    // the call was successful
+                    Toast.makeText(this, "Note saved successfully!", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener {
+                    // we've got an error
+                    Toast.makeText(this, "Error occurred in database connection!", Toast.LENGTH_SHORT).show()
+                    Log.e(TAG, "Firestore Error : ${it.message}")
+                }
+```
+
+-------------------------------------------
+
+### **How to Get data from Firestore database and display in your app**:
+
+There are 2 different ways for doing that:
+<ol>
+<li>Set a listener which will fetch data in realtime, as soon as something changes in documents of Firestore database.</li>
+<li>Retrieve the data by calling a method, for example when user clicks a button (this won't be in realtime).</li>
+</ol>
+
+The second approach is easier to do, and for that, you firstly need to have a reference to the specific document you wanna load info from  👇
+
+```
+// A reference to the document that we're interacting with
+val noteRef = db.collection("Notebook").document("My First Note")
+```
+
+In the code above we have created an object of type <a href="https://firebase.google.com/docs/reference/android/com/google/firebase/firestore/DocumentReference">DocumentReference</a> because we want to read data from a document, but you can also create a <a href="https://firebase.google.com/docs/reference/android/com/google/firebase/firestore/CollectionReference">CollectionReference</a>.
+After defining a reference to your note, you will write the code for getting your needed info out of a <a href="https://firebase.google.com/docs/reference/android/com/google/firebase/firestore/DocumentSnapshot">DocumentSnapshot</a> in this way  👇
+
+```
+noteRef.get()
+    .addOnSuccessListener {
+        if (it.exists()) {
+          // Get our needed data out of this DocumentSnapshot and load into TextView.
+          val note = it.getData()
+          binding.textViewData.text ="Title : ${note?.get(KEY_TITLE)}\nDescription : ${note?.get(KEY_DESCRIPTION)}"
+                        } else {
+                            Toast.makeText(this, "Document doesn't exist!", Toast.LENGTH_SHORT).show()
+                               }
+                          }
+    .addOnFailureListener {
+        Toast.makeText(this, "Error retrieving data!", Toast.LENGTH_SHORT).show()
+        Log.e(TAG, it.message.toString())
+                          }
+```
+
+At this point, if you keep playing with your app, your UI will be something like this 👇
+<br/><br/>
+<img alt="UI screenshot1" src="DocumentationAssets/UI screenshot 1.jpg"  width="60%" height="60%"/><br/><br/>
