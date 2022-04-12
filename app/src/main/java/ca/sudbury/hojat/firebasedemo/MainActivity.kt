@@ -36,14 +36,10 @@ class MainActivity : AppCompatActivity() {
                 return@addSnapshotListener
             }
             if (value?.exists() == true) {
-                // The document that we're listening to exists in this directory
-                val note = value.data
-                binding.textViewData.text =
-                    "Title : ${note?.get(KEY_TITLE)}\nDescription : ${
-                        note?.get(
-                            KEY_DESCRIPTION
-                        )
-                    }"
+                val note = value.toObject(Note::class.java)
+                binding.textViewData.text = "Title : ${note?.title}\nDescription : ${
+                    note?.description
+                }"
             } else {
                 // The document doesn't exists (most likely user has deleted it)
                 binding.textViewData.text = ""
@@ -55,19 +51,15 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+
         binding.buttonSave.setOnClickListener {
             val title = binding.editTextTitle.text.toString()
             val description = binding.editTextDescription.text.toString()
+            val note = Note(title, description)
 
-            // we need to firstly put our data into key-value pairs
-            // and then upload them into Firestore
-            val note = HashMap<String, Any>().apply {
-                this[KEY_TITLE] = title
-                this[KEY_DESCRIPTION] = description
-            }
             // Now we create a "Notebook" collection, the document
             // "My First Note" inside that collection and will add
-            // our key-value pairs to that document.
+            // our kotlin data class to that document.
             noteRef.set(note)
                 .addOnSuccessListener {
                     // the call was successful
@@ -88,13 +80,11 @@ class MainActivity : AppCompatActivity() {
             noteRef.get()
                 .addOnSuccessListener {
                     if (it.exists()) {
-                        // Get our needed data out of this DocumentSnapshot and load into TextView.
-                        val note = it.data
+                        // recreate our Note object from Document Snapshot:
+                        val note = it.toObject(Note::class.java)
                         binding.textViewData.text =
-                            "Title : ${note?.get(KEY_TITLE)}\nDescription : ${
-                                note?.get(
-                                    KEY_DESCRIPTION
-                                )
+                            "Title : ${note?.title}\nDescription : ${
+                                note?.description
                             }"
                     } else {
                         Toast.makeText(this, "Document doesn't exist!", Toast.LENGTH_SHORT).show()

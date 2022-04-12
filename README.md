@@ -329,3 +329,95 @@ We're done in here, but remember that since you're allowing the user to delete t
     }
 ```
 
+-------------------------------------------
+
+## **How to save POJOs into Firestore database**:
+
+Well actually in here, when I say "POJO", I mean a kotlin data class 😁
+
+It's nice, fast and a lot more convenient to store your kotlin data objects into Firestore documents 👍
+
+First of all, you need to define a kotlin data class like this (remember to set default values for all of the fields of your data class):
+
+```
+data class Note(val title: String = "", val description: String = "")
+```
+After that, the code for saving data into Firestore database will change to look like this:
+
+```
+binding.buttonSave.setOnClickListener {
+            val title = binding.editTextTitle.text.toString()
+            val description = binding.editTextDescription.text.toString()
+            val note = Note(title, description)
+            
+            // Now we create a "Notebook" collection, the document
+            // "My First Note" inside that collection and will add
+            // our kotlin data class to that document.
+            noteRef.set(note)
+                .addOnSuccessListener {
+                    // the call was successful
+                    Toast.makeText(this, "Note saved successfully!", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener {
+                    // we've got an error
+                    Toast.makeText(
+                        this,
+                        "Error occurred in database connection!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    Log.e(TAG, "Firestore Error : ${it.message}")
+                }
+
+        }
+```
+
+Accordingly, the source code for loading info from Firestore database will change to look like this:
+
+```
+binding.buttonLoad.setOnClickListener {
+            noteRef.get()
+                .addOnSuccessListener {
+                    if (it.exists()) {
+                        // recreate our Note object from Document Snapshot:
+                        val note = it.toObject(Note::class.java)
+                        binding.textViewData.text =
+                            "Title : ${note?.title}\nDescription : ${
+                                note?.description
+                            }"
+                    } else {
+                        Toast.makeText(this, "Document doesn't exist!", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                .addOnFailureListener {
+                    Toast.makeText(this, "Error retrieving data!", Toast.LENGTH_SHORT).show()
+                    Log.e(TAG, it.message.toString())
+                }
+        }
+```
+
+And finally, we need to also change the code that registered a listener to this document of Fiestore database:
+
+```
+@SuppressLint("SetTextI18n")
+    override fun onStart() {
+        super.onStart()
+        noteRef.addSnapshotListener(this) { value, error ->
+            if (error != null) {
+                Toast.makeText(this, "Error while loading!", Toast.LENGTH_SHORT).show()
+                Log.e(TAG, error.message.toString())
+                return@addSnapshotListener
+            }
+            if (value?.exists() == true) {
+                val note = value.toObject(Note::class.java)
+                binding.textViewData.text = "Title : ${note?.title}\nDescription : ${
+                    note?.description
+                }"
+            } else {
+                // The document doesn't exists (most likely user has deleted it)
+                binding.textViewData.text = ""
+            }
+        }
+    }
+```
+
+After doing all of these, run the code and you'd be able to see that everything works the same as before 👌.
