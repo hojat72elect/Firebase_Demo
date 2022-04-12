@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import ca.sudbury.hojat.firebasedemo.databinding.ActivityMainBinding
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 
@@ -25,6 +26,30 @@ class MainActivity : AppCompatActivity() {
     // A reference to the document that we're interacting with ().
     private val noteRef = db.collection("Notebook").document("My First Note")
 
+    @SuppressLint("SetTextI18n")
+    override fun onStart() {
+        super.onStart()
+        noteRef.addSnapshotListener(this) { value, error ->
+            if (error != null) {
+                Toast.makeText(this, "Error while loading!", Toast.LENGTH_SHORT).show()
+                Log.e(TAG, error.message.toString())
+                return@addSnapshotListener
+            }
+            if (value?.exists() == true) {
+                // The document that we're listening to exists in this directory
+                val note = value.data
+                binding.textViewData.text =
+                    "Title : ${note?.get(KEY_TITLE)}\nDescription : ${
+                        note?.get(
+                            KEY_DESCRIPTION
+                        )
+                    }"
+            } else {
+                // The document doesn't exists (most likely user has deleted it)
+                binding.textViewData.text = ""
+            }
+        }
+    }
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,31 +114,19 @@ class MainActivity : AppCompatActivity() {
             val note = HashMap<String, Any>().also {
                 it[KEY_DESCRIPTION] = description
             }
-            /*
-            * This code line only merges this data with the document in the corresponding DocumentReference.
-            * In this case, */
-            noteRef.set(note, SetOptions.merge())
-        }
-    }
 
-    @SuppressLint("SetTextI18n")
-    override fun onStart() {
-        super.onStart()
-        noteRef.addSnapshotListener(this) { value, error ->
-            if (error != null) {
-                Toast.makeText(this, "Error while loading!", Toast.LENGTH_SHORT).show()
-                Log.e(TAG, error.message.toString())
-                return@addSnapshotListener
-            }
-            if (value?.exists() == true) {
-                val note = value.data
-                binding.textViewData.text =
-                    "Title : ${note?.get(KEY_TITLE)}\nDescription : ${
-                        note?.get(
-                            KEY_DESCRIPTION
-                        )
-                    }"
-            }
+            // This code line only merges this data with
+            // the document in the corresponding DocumentReference.
+            noteRef.set(note, SetOptions.merge())
+
+        }
+        binding.buttonDeleteDescription.setOnClickListener {
+            // Only deletes the description field from document
+            noteRef.update(KEY_DESCRIPTION, FieldValue.delete())
+        }
+        binding.buttonDeleteNote.setOnClickListener {
+            // Deletes the document in this DocumentReference
+            noteRef.delete()
         }
     }
 

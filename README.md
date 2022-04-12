@@ -256,3 +256,76 @@ binding.buttonUpdateDescription.setOnClickListener {
 ```
 
 **The code above merges the data to the document in corresponding `DocumentReference`, that's why other fields of document won't change.**
+
+Another way of merging data without overriding other fields is to change this code line 👇
+
+```
+// Creates a new document if doesn't exist
+noteRef.set(note, SetOptions.merge())
+```
+
+with this one 👇
+
+```
+// Doesn't create any new document if it doesn't already exist
+noteRef.update(note)
+```
+
+-------------------------------------------
+
+## **Delete document from database**:
+
+⚠️ Remember that when you delete all the documents inside a collection, that collection will be deleted automatically.
+
+In this scenario, we firstly change the UI too look like this 👇
+<br/><br/>
+<img alt="UI screenshot2" src="DocumentationAssets/UI screenshot 3.png"  width="60%" height="60%"/><br/><br/>
+
+The **DELETE DESRIPTION** key only deletes the `description` field from the document and **DELETE NOTE** is supposed to delete the whole document from Firestore database.
+This is the code that will run when user clicks on **DELETE DESCRIPTION** 👇
+
+```
+binding.buttonDeleteDescription.setOnClickListener {
+            // Only deletes the description field from document
+            noteRef.update(KEY_DESCRIPTION, FieldValue.delete())
+        }
+```
+
+Furthermore, this is the code that will run when user clicks on **DELETE NOTE** 👇
+
+```
+binding.buttonDeleteNote.setOnClickListener {
+    // Deletes the document in this DocumentReference
+    noteRef.delete()
+    }
+```
+
+We're done in here, but remember that since you're allowing the user to delete the whole document, you need to also change the code of your listener to deal with the situations where there's no documnet to read from. So, the `onStart()` callback of our activity will change to look like this 👇
+
+```
+@SuppressLint("SetTextI18n")
+    override fun onStart() {
+        super.onStart()
+        noteRef.addSnapshotListener(this) { value, error ->
+            if (error != null) {
+                Toast.makeText(this, "Error while loading!", Toast.LENGTH_SHORT).show()
+                Log.e(TAG, error.message.toString())
+                return@addSnapshotListener
+            }
+            if (value?.exists() == true) {
+                // The document that we're listening to exists in this directory
+                val note = value.data
+                binding.textViewData.text =
+                    "Title : ${note?.get(KEY_TITLE)}\nDescription : ${
+                        note?.get(
+                            KEY_DESCRIPTION
+                        )
+                    }"
+            } else {
+                // The document doesn't exists (most likely user has deleted it)
+                binding.textViewData.text = ""
+            }
+        }
+    }
+```
+
