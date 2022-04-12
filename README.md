@@ -122,15 +122,13 @@ And then, you will create a collection and document for saving this info to Fire
 
 -------------------------------------------
 
-### **How to Get data from Firestore database and display in your app**:
+## **How to Get data from Firestore database and display in your app**:
 
 There are 2 different ways for doing that:
-<ol>
-<li>Set a listener which will fetch data in realtime, as soon as something changes in documents of Firestore database.</li>
-<li>Retrieve the data by calling a method, for example when user clicks a button (this won't be in realtime).</li>
-</ol>
 
-The second approach is easier to do, and for that, you firstly need to have a reference to the specific document you wanna load info from  👇
+## 1. Retrieve the data by calling a method, for example when user clicks a button (this won't be in realtime):
+
+This approach is easier to do, and for that, you firstly need to have a reference to the specific document you wanna load info from  👇
 
 ```
 // A reference to the document that we're interacting with
@@ -160,3 +158,68 @@ noteRef.get()
 At this point, if you keep playing with your app, your UI will be something like this 👇
 <br/><br/>
 <img alt="UI screenshot1" src="DocumentationAssets/UI screenshot 1.jpg"  width="60%" height="60%"/><br/><br/>
+
+## 2. Set a listener which will fetch data in realtime, as soon as something changes in documents of Firestore database:
+
+When you're going to get data this way, it's really important to pay attention to Activity lifecycle. Register the listener in the `onStart()` callback of your activity 👇
+
+```
+ override fun onStart() {
+        super.onStart()
+        noteRef.addSnapshotListener { value, error ->
+        }
+    }
+```
+And inside this listener, you can write anything that you want to happen whenever this specific **document** inside Firestore changes. For example, I'm going to copy/paste the previous code in here 👇
+
+```
+ @SuppressLint("SetTextI18n")
+    override fun onStart() {
+        super.onStart()
+        noteRef.addSnapshotListener { value, error ->
+            if (error != null) {
+                Toast.makeText(this, "Error while loading!", Toast.LENGTH_SHORT).show()
+                Log.e(TAG, error.message.toString())
+                return@addSnapshotListener
+            }
+            if (value?.exists() == true) {
+                val note = value.data
+                binding.textViewData.text =
+                    "Title : ${note?.get(KEY_TITLE)}\nDescription : ${
+                        note?.get(
+                            KEY_DESCRIPTION
+                        )
+                    }"
+            }
+        }
+    }
+```
+👆👆 As you can see, in the code above we have registered a listener to a specific **document** of Firestore in the `onStart()` callback of activity.
+
+**The implementation above is kind of naive, mostly because it only registers the listener in the `onStart()` callback of the activity but doesn't pay attention to detaching it when the activity is being stopped.**
+
+In order to solve this issue in an extremely easy way, Firestore provides an overloaded form of `addSnapshotListener()` method, which you can use like this 👇👇
+
+```
+ @SuppressLint("SetTextI18n")
+    override fun onStart() {
+        super.onStart()
+        noteRef.addSnapshotListener(this) { value, error ->
+            if (error != null) {
+                Toast.makeText(this, "Error while loading!", Toast.LENGTH_SHORT).show()
+                Log.e(TAG, error.message.toString())
+                return@addSnapshotListener
+            }
+            if (value?.exists() == true) {
+                val note = value.data
+                binding.textViewData.text =
+                    "Title : ${note?.get(KEY_TITLE)}\nDescription : ${
+                        note?.get(
+                            KEY_DESCRIPTION
+                        )
+                    }"
+            }
+        }
+    }
+```
+This way, whenever `onStop()` callback of the activity is called, this listener will be automatically removed.

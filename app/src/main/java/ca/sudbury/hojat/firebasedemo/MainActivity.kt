@@ -9,6 +9,7 @@ import androidx.databinding.DataBindingUtil
 import ca.sudbury.hojat.firebasedemo.databinding.ActivityMainBinding
 import com.google.firebase.firestore.FirebaseFirestore
 
+
 class MainActivity : AppCompatActivity() {
     private val TAG = "MainActivity"
     private lateinit var binding: ActivityMainBinding
@@ -21,7 +22,8 @@ class MainActivity : AppCompatActivity() {
     val db = FirebaseFirestore.getInstance()
 
     // A reference to the document that we're interacting with ().
-    val noteRef = db.collection("Notebook").document("My First Note")
+    private val noteRef = db.collection("Notebook").document("My First Note")
+
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -78,4 +80,27 @@ class MainActivity : AppCompatActivity() {
                 }
         }
     }
+
+    @SuppressLint("SetTextI18n")
+    override fun onStart() {
+        super.onStart()
+        noteRef.addSnapshotListener(this) { value, error ->
+            if (error != null) {
+                Toast.makeText(this, "Error while loading!", Toast.LENGTH_SHORT).show()
+                Log.e(TAG, error.message.toString())
+                return@addSnapshotListener
+            }
+            if (value?.exists() == true) {
+                val note = value.data
+                binding.textViewData.text =
+                    "Title : ${note?.get(KEY_TITLE)}\nDescription : ${
+                        note?.get(
+                            KEY_DESCRIPTION
+                        )
+                    }"
+            }
+        }
+    }
+
+
 }
