@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import ca.sudbury.hojat.firebasedemo.databinding.ActivityMainBinding
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 
 
 class MainActivity : AppCompatActivity() {
@@ -36,8 +37,8 @@ class MainActivity : AppCompatActivity() {
             // we need to firstly put our data into key-value pairs
             // and then upload them into Firestore
             val note = HashMap<String, Any>().apply {
-                this.put(KEY_TITLE, title)
-                this.put(KEY_DESCRIPTION, description)
+                this[KEY_TITLE] = title
+                this[KEY_DESCRIPTION] = description
             }
             // Now we create a "Notebook" collection, the document
             // "My First Note" inside that collection and will add
@@ -63,7 +64,7 @@ class MainActivity : AppCompatActivity() {
                 .addOnSuccessListener {
                     if (it.exists()) {
                         // Get our needed data out of this DocumentSnapshot and load into TextView.
-                        val note = it.getData()
+                        val note = it.data
                         binding.textViewData.text =
                             "Title : ${note?.get(KEY_TITLE)}\nDescription : ${
                                 note?.get(
@@ -78,6 +79,20 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(this, "Error retrieving data!", Toast.LENGTH_SHORT).show()
                     Log.e(TAG, it.message.toString())
                 }
+        }
+        binding.buttonUpdateDescription.setOnClickListener {
+            // we get the input text of description EditText and
+            // only update the field of "description" in the
+            // corresponding document in Firestore (without
+            // overriding any other data).
+            val description = binding.editTextDescription.text.toString()
+            val note = HashMap<String, Any>().also {
+                it[KEY_DESCRIPTION] = description
+            }
+            /*
+            * This code line only merges this data with the document in the corresponding DocumentReference.
+            * In this case, */
+            noteRef.set(note, SetOptions.merge())
         }
     }
 

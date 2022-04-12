@@ -223,3 +223,36 @@ In order to solve this issue in an extremely easy way, Firestore provides an ove
     }
 ```
 This way, whenever `onStop()` callback of the activity is called, this listener will be automatically removed.
+
+-------------------------------------------
+
+## **Merge and Update on database**:
+
+How we can update a single field in a document without overriding all of its other fields ?
+
+For example, imagine we have changed the UI of our app to look like this 👇
+
+<img alt="UI screenshot2" src="DocumentationAssets/UI screenshot 2.png"  width="60%" height="60%"/><br/><br/>
+
+And we want the feature that "when user clicks on **UPDATE DESCRIPTION**, only the `description` be updated in Firestore database; nothing else".
+
+In order to do that, you can add this code line to your MainActivity's `onCreate()` callback 👇
+
+```
+binding.buttonUpdateDescription.setOnClickListener {
+    // we get the input text of description EditText and
+    // only update the field of "description" in the
+    // corresponding document in Firestore (without
+    // overriding any other data).
+    val description = binding.editTextDescription.text.toString()
+    val note = HashMap<String, Any>().also {
+        it[KEY_DESCRIPTION] = description
+    }
+    /*
+    * This code line only merges this data with the document in the corresponding DocumentReference.
+    * In this case, */
+    noteRef.set(note, SetOptions.merge())
+}
+```
+
+**The code above merges the data to the document in corresponding `DocumentReference`, that's why other fields of document won't change.**
