@@ -24,43 +24,29 @@
             android:inputType="text" />
 
         <Button
-            android:id="@+id/button_save"
+            android:id="@+id/button_add"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Save" />
+            android:text="Add" />
 
         <Button
-            android:id="@+id/button_load"
+            android:id="@+id/button_load_all"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Load" />
+            android:text="Load Notes" />
 
-        <Button
-            android:id="@+id/button_update_description"
+
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Update description" />
+            android:layout_height="wrap_content">
 
-        <Button
-            android:id="@+id/button_delete_description"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Delete description" />
+            <TextView
+                android:id="@+id/text_view_data"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="hello! whatsup!"
+                android:textSize="20sp" />
 
-        <Button
-            android:id="@+id/button_delete_note"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Delete note" />
-
-        <TextView
-            android:id="@+id/text_view_data"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="yo! whatsup!"
-            android:textSize="20sp" />
-
+        </androidx.core.widget.NestedScrollView>
     </LinearLayout>
-
-
 </layout>

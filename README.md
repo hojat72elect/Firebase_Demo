@@ -420,4 +420,73 @@ And finally, we need to also change the code that registered a listener to this 
     }
 ```
 
-After doing all of these, run the code and you'd be able to see that everything works the same as before 👌.
+After doing all of these, run the code and you'd be able to see that everything works the same as before, but instead of just uploading some key-value pairs, right now, you're uploading Kotlin data classes 👌.
+
+-------------------------------------------
+
+## **How to add and retrieve multiple documents into a Firestore database**:
+
+In this situation, when user enters a new note, it will be added as a new document to the main collection. It won't be like updating the same document with new information, but adding a new document to the collection of documents.
+
+Firstly, change the XML UI of your `activity_main.xml` to be like this:
+
+```
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <EditText
+            android:id="@+id/edit_text_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Title"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/edit_text_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Description"
+            android:inputType="text" />
+
+        <Button
+            android:id="@+id/button_add"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Add" />
+
+        <Button
+            android:id="@+id/button_load_all"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Load Notes" />
+
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/text_view_data"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="hello! whatsup!"
+                android:textSize="20sp" />
+
+        </androidx.core.widget.NestedScrollView>
+    </LinearLayout>
+</layout>
+```
+
+And now, your UI looks like this 👇👇
+
+<br/>
+<img alt="UI screenshot4" src="DocumentationAssets/UI screenshot 4.png"  width="60%" height="60%"/><br/><br/>
+Now change your kotlin code to be like this:
